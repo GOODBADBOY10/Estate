@@ -1,5 +1,6 @@
-import bcrypt from 'bcrypt';
-import jwt, { sign } from 'jsonwebtoken'
+import * as bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import prisma from '../lib/prisma.js';
 
 export const register = async (req, res) => {
@@ -8,6 +9,7 @@ export const register = async (req, res) => {
     try {
         //Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
+        console.log(hashedPassword);
         //create a new user 
         const newUser = await prisma.user.create({
             data: {
@@ -16,7 +18,7 @@ export const register = async (req, res) => {
                 password: hashedPassword,
             }
         });
-        // console.log(newUser);
+        console.log(newUser);
         res.status(201).json({ message: 'User created successfully' });
     } catch (err) {
         console.log(err);
@@ -40,7 +42,8 @@ export const login = async (req, res) => {
         const age = 1000 * 60 * 60 * 24 * 7
 
         const token = jwt.sign({
-            id: user.id
+            id: user.id,
+            // isAdmin: false
         }, process.env.JWT_SECRET_KEY, 
         { expiresIn: age }
         );
