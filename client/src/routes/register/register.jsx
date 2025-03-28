@@ -16,11 +16,12 @@ function Register() {
     const formData = new FormData(e.target);
     const username = formData.get('username');
     const email = formData.get('email');
-    const password = formData.get('passsword');
+    const password = formData.get('password');
     try {
       const res = await apiRequest.post("/auth/register", {
         username, email, password
       })
+      console.log(res);
       navigate("/login");
     } catch (error) {
       console.log(error);

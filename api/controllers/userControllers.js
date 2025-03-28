@@ -30,7 +30,9 @@ export const getUser = async (req, res) => {
 
 export const updateUser = async (req, res) => {
     const id = req.params.id;
+    console.log(id)
     const tokenUserId = req.userId;
+    console.log(tokenUserId);
     const { password, avatar, ...inputs } = req.body
     if (id !== tokenUserId) {
         return res.status(403).json({ message: "Not Authorized" });
@@ -59,7 +61,7 @@ export const updateUser = async (req, res) => {
 
         const { password: userPassword, ...rest } = updatedUser
 
-        // console.log(updatedUser);
+        console.log(updatedUser);
         res.status(200).json(rest)
     } catch (error) {
         console.log(error)
