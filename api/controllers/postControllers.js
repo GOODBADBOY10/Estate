@@ -1,10 +1,26 @@
 import prisma from "../lib/prisma.js"
+import jwt from 'jsonwebtoken'
 
-export const getPosts = async () => {
+export const getPosts = async (req, res) => {
+    const query = req.query;
+    // console.log(query);
     try {
-        const posts = await prisma.post.findMany();
+        const posts = await prisma.post.findMany({
+            where: {
+                city: query.city || undefined,
+                type: query.type || undefined,
+                property: query.property || undefined,
+                bedroom: parseInt(query.bedroom) || undefined,
+                price: {
+                    gte: parseInt(query.minPrice) || 0,
+                    lte: parseInt(query.maxPrice) || 10000000,
+                }
+            }
+        });
 
-        res.status(200).json(posts);
+        setTimeout(() => {
+            res.status(200).json(posts);
+        }, 3000);
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: "Failed to get all posts" })
@@ -12,7 +28,7 @@ export const getPosts = async () => {
 }
 
 
-export const getPost = async () => {
+export const getPost = async (req, res) => {
     const id = req.params.id
     try {
         const post = await prisma.post.findUnique({
@@ -30,7 +46,33 @@ export const getPost = async () => {
             },
         });
 
-        res.status(200).json(post);
+        let userId;
+
+        const token = req.cookies?.token;
+
+        if (!token) {
+            userId = null;
+        } else {
+            jwt.verify(token, process.env.JWT_SECRET_KEY, async(err, payload) => {
+                if (err) {
+                    userId = null;
+                } else {
+                    userId = payload.id;
+                }
+            })
+        }
+
+
+        const saved = await prisma.savedPost.findUnique({
+            where: {
+                userId_postId: {
+                    postId: id,
+                    userId,
+                },
+            },
+        });
+
+        res.status(200).json({...post, isSaved: saved ? true : false});
     } catch (error) {
         console.log(error)
         res.status(500).json({ message: "Failed to get post" })
@@ -39,7 +81,7 @@ export const getPost = async () => {
 
 
 
-export const addPost = async () => {
+export const addPost = async (req, res) => {
     const body = req.body
     const tokenUserId = req.userId
     try {
@@ -61,7 +103,7 @@ export const addPost = async () => {
 
 
 
-export const updatePost = async () => {
+export const updatePost = async (req, res) => {
     // const body = req.body
     // const tokenUserId = req.userId
     res.status(200).json();
@@ -75,7 +117,7 @@ export const updatePost = async () => {
 
 
 
-export const deletePost = async () => {
+export const deletePost = async (req, res) => {
     const id = req.params.id
     const tokenUserId = req.userId
     try {

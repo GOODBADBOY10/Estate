@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import authRoute from './routes/authRoute.js'
 import userRoutes from './routes/userRoutes.js'
 import postRoutes from './routes/postRoute.js'
+import chatRoutes from './routes/chatRoute.js'
+import messageRoutes from './routes/messageRoute.js'
 import testRoute from './routes/testRoute.js'
 
 const app = express();
@@ -25,6 +27,8 @@ app.use((req, res, next) => {
 app.use('/api/auth', authRoute);
 app.use('/api/user', userRoutes);
 app.use('/api/post', postRoutes);
+app.use('/api/chats', chatRoutes);
+app.use('/api/messages', messageRoutes);
 app.use('/api/test', testRoute);
 
 app.listen(8800, () => {
